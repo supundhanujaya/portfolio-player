@@ -1,87 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Portfolio Player</title>
-<link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Surgical Audio Portfolio</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <section class="supun-portfolio-glass">
-  <div class="p-container">
-    <div class="p-header">
-      <span class="p-badge">Portfolio</span>
-      <h2>Studio <span class="p-accent">Results.</span></h2>
-      <div class="p-header-line"></div>
-    </div>
+    <div class="p-container">
+        <div class="p-header">
+            <span class="p-badge">Portfolio</span>
+            <h2>Studio <span class="p-accent">Results.</span></h2>
+            <div class="p-header-line"></div>
+        </div>
 
-    <div class="p-list" id="track-list">
-      <!-- Tracks will be injected here by JS -->
+        <div class="p-list" id="track-list">
+            </div>
     </div>
-  </div>
 </section>
 
 <script>
 // ====== TRACK DATA ======
+// Tip: Use Dropbox (with ?raw=1) or a dedicated host for better reliability than Google Drive
 const tracks = [
-  {
-    title: "My Song",
-    category: "Trap",
-    before: "https://drive.google.com/uc?export=download&id=13u1aC2Q15noodKjBsbSDx8m_7BgM5lVj",
-    after: "https://drive.google.com/uc?export=download&id=18vaUoijy4bDYJG5MJ7r8m9wB8iklW00U"
-  },
-  {
-    title: "Another Song",
-    category: "Pop",
-    before: "https://drive.google.com/uc?export=download&id=BEFORE_ID2",
-    after: "https://drive.google.com/uc?export=download&id=AFTER_ID2"
-  }
+    {
+        title: "My Song",
+        category: "Trap",
+        before: "https://drive.google.com/uc?export=download&id=13u1aC2Q15noodKjBsbSDx8m_7BgM5lVj",
+        after: "https://drive.google.com/uc?export=download&id=18vaUoijy4bDYJG5MJ7r8m9wB8iklW00U"
+    },
+    {
+        title: "Another Song",
+        category: "Pop",
+        before: "BEFORE_LINK_2",
+        after: "AFTER_LINK_2"
+    }
 ];
 
-// ====== GENERATE TRACK HTML ======
 const trackList = document.getElementById("track-list");
 
+// ====== GENERATION LOGIC ======
 tracks.forEach((track, index) => {
-  const trackId = index + 1;
+    const trackId = index + 1;
+    const html = `
+    <div class="p-item">
+        <div class="p-info">
+            <span class="p-category">${track.category}</span>
+            <h3>${track.title}</h3>
+        </div>
+        <div class="p-controls">
+            <div class="p-switch">
+                <input type="radio" name="track-${trackId}" id="t-${trackId}-b" class="p-radio" 
+                    onchange="syncAudio(${trackId}, '${track.before}')">
+                <label for="t-${trackId}-b" class="p-label">BEFORE</label>
 
-  const html = `
-  <div class="p-item">
-    <div class="p-info">
-      <span class="p-category">${track.category}</span>
-      <h3>${track.title}</h3>
+                <input type="radio" name="track-${trackId}" id="t-${trackId}-a" class="p-radio" checked 
+                    onchange="syncAudio(${trackId}, '${track.after}')">
+                <label for="t-${trackId}-a" class="p-label">AFTER</label>
+
+                <span class="p-slider"></span>
+            </div>
+            <audio id="audio-${trackId}" controls class="p-audio-glass">
+                <source src="${track.after}" type="audio/mpeg">
+            </audio>
+        </div>
     </div>
-    <div class="p-controls">
-      <div class="p-switch">
-        <input type="radio" name="track-${trackId}" id="track-${trackId}-before" class="p-radio" onchange="
-          var a=this.parentNode.parentNode.querySelector('audio');
-          var s=a.querySelector('source');
-          var t=a.currentTime; var p=!a.paused;
-          s.src='${track.before}'; a.load(); a.currentTime=t; if(p) a.play();
-        ">
-        <label for="track-${trackId}-before" class="p-label">BEFORE</label>
-
-        <input type="radio" name="track-${trackId}" id="track-${trackId}-after" class="p-radio" checked onchange="
-          var a=this.parentNode.parentNode.querySelector('audio');
-          var s=a.querySelector('source');
-          var t=a.currentTime; var p=!a.paused;
-          s.src='${track.after}'; a.load(); a.currentTime=t; if(p) a.play();
-        ">
-        <label for="track-${trackId}-after" class="p-label">AFTER</label>
-
-        <span class="p-slider"></span>
-      </div>
-      <audio controls class="p-audio-glass">
-        <source src="${track.after}" type="audio/mpeg">
-      </audio>
-    </div>
-  </div>
-  <div class="p-divider"></div>
-  `;
-
-  trackList.insertAdjacentHTML("beforeend", html);
+    <div class="p-divider"></div>`;
+    trackList.insertAdjacentHTML("beforeend", html);
 });
-</script>
 
+// ====== SURGICAL SYNC FUNCTION ======
+function syncAudio(id, newSrc) {
+    const player = document.getElementById('audio-' + id);
+    const time = player.currentTime;
+    const isPlaying = !player.paused;
+
+    player.src = newSrc;
+    player.load();
+    
+    player.addEventListener('loadedmetadata', function() {
+        this.currentTime = time;
+        if (isPlaying) this.play();
+    }, { once: true });
+}
+</script>
 </body>
 </html>
