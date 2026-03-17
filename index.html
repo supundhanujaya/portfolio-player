@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Surgical Audio Portfolio</title>
+    <title>Surgical Portfolio</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -15,14 +15,11 @@
             <h2>Studio <span class="p-accent">Results.</span></h2>
             <div class="p-header-line"></div>
         </div>
-
-        <div class="p-list" id="track-list">
-            </div>
+        <div class="p-list" id="track-list"></div>
     </div>
 </section>
 
 <script>
-// ====== TRACK DATA ======
 const tracks = [
     {
         title: "Back Home To Blue",
@@ -32,9 +29,8 @@ const tracks = [
     }
 ];
 
-// Dropbox Link Fixer
 function fixLink(url) {
-    if (!url || url === "" || url === "PASTE_BEFORE_LINK_HERE") return "";
+    if (!url || url.includes("BEFORE_LINK")) return "";
     return url.replace('dl=0', 'raw=1').replace('www.dropbox.com', 'dl.dropboxusercontent.com');
 }
 
@@ -42,15 +38,12 @@ const trackList = document.getElementById("track-list");
 
 tracks.forEach((track, index) => {
     const trackId = index + 1;
-    const initialSrc = fixLink(track.after);
-
     const html = `
     <div class="p-item">
         <div class="p-info">
             <span class="p-category">${track.category}</span>
             <h3>${track.title}</h3>
         </div>
-        
         <div class="p-controls">
             <div class="p-switch">
                 <input type="radio" name="track-${trackId}" id="t-${trackId}-b" class="p-radio" onchange="syncAudio(${trackId}, '${fixLink(track.before)}')">
@@ -59,16 +52,15 @@ tracks.forEach((track, index) => {
                 <label for="t-${trackId}-a" class="p-label">AFTER</label>
                 <span class="p-slider"></span>
             </div>
-
-            <div class="custom-player" id="player-container-${trackId}">
-                <button class="play-btn" onclick="togglePlay(${trackId})" id="play-btn-${trackId}">
-                    <svg viewBox="0 0 24 24" id="icon-${trackId}"><path d="M7 6v12l10-6z" fill="currentColor"/></svg>
+            <div class="custom-player">
+                <button class="play-btn" onclick="togglePlay(${trackId})">
+                    <svg viewBox="0 0 24 24" width="16" height="16" id="icon-${trackId}"><path d="M8 5v14l11-7z" fill="currentColor"/></svg>
                 </button>
                 <div class="progress-area" onclick="seek(event, ${trackId})">
                     <div class="progress-bar" id="progress-${trackId}"></div>
                 </div>
-                <audio id="audio-${trackId}" ontimeupdate="updateProgress(${trackId})" onended="resetPlayer(${trackId})" preload="auto">
-                    <source src="${initialSrc}" type="audio/mpeg">
+                <audio id="audio-${trackId}" ontimeupdate="updateProgress(${trackId})" onended="resetPlayer(${trackId})">
+                    <source src="${fixLink(track.after)}" type="audio/mpeg">
                 </audio>
             </div>
         </div>
@@ -77,22 +69,11 @@ tracks.forEach((track, index) => {
     trackList.insertAdjacentHTML("beforeend", html);
 });
 
-// ====== PLAYER LOGIC ======
 function togglePlay(id) {
     const audio = document.getElementById('audio-' + id);
     const path = document.querySelector(`#icon-${id} path`);
-    
-    // Pause others
-    document.querySelectorAll('audio').forEach(a => {
-        if(a.id !== 'audio-'+id) {
-            a.pause();
-            const otherId = a.id.split('-')[1];
-            document.querySelector(`#icon-${otherId} path`).setAttribute('d', 'M8 5v14l11-7z');
-        }
-    });
-
     if (audio.paused) {
-        audio.play().catch(e => console.log("Direct play failed, check link"));
+        audio.play();
         path.setAttribute('d', 'M6 19h4V5H6v14zm8-14v14h4V5h-4z');
     } else {
         audio.pause();
@@ -102,29 +83,22 @@ function togglePlay(id) {
 
 function updateProgress(id) {
     const audio = document.getElementById('audio-' + id);
-    const progress = document.getElementById('progress-' + id);
-    if (audio.duration) {
-        const value = (audio.currentTime / audio.duration) * 100;
-        progress.style.width = value + '%';
-    }
+    const bar = document.getElementById('progress-' + id);
+    bar.style.width = (audio.currentTime / audio.duration * 100) + '%';
 }
 
 function seek(e, id) {
     const audio = document.getElementById('audio-' + id);
-    const area = e.currentTarget;
-    audio.currentTime = (e.offsetX / area.clientWidth) * audio.duration;
+    audio.currentTime = (e.offsetX / e.currentTarget.clientWidth) * audio.duration;
 }
 
 function syncAudio(id, newSrc) {
     const audio = document.getElementById('audio-' + id);
     const time = audio.currentTime;
-    const isPlaying = !audio.paused;
+    const playing = !audio.paused;
     audio.src = newSrc;
     audio.load();
-    audio.onloadeddata = () => {
-        audio.currentTime = time;
-        if (isPlaying) audio.play();
-    };
+    audio.onloadeddata = () => { audio.currentTime = time; if (playing) audio.play(); };
 }
 
 function resetPlayer(id) {
