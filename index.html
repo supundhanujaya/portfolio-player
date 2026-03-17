@@ -15,35 +15,33 @@
             <h2>Studio <span class="p-accent">Results.</span></h2>
             <div class="p-header-line"></div>
         </div>
-
-        <div class="p-list" id="track-list">
-            </div>
+        <div class="p-list" id="track-list"></div>
     </div>
 </section>
 
 <script>
 // ====== TRACK DATA ======
-// Tip: Use Dropbox (with ?raw=1) or a dedicated host for better reliability than Google Drive
 const tracks = [
     {
-        title: "My Song",
-        category: "Trap",
-        before: "https://www.dropbox.com/scl/fi/vtl2yv1squy8mhs0ops7h/TheLongWait_BackHomeToBlue_Full-master.mp3?rlkey=qp4ob4w0fkpd818c9si15974l&st=f1hmwzkw&raw=1",
-        after: "https://drive.google.com/uc?export=download&id=18vaUoijy4bDYJG5MJ7r8m9wB8iklW00U"
-    },
-    {
-        title: "Another Song",
-        category: "Pop",
-        before: "BEFORE_LINK_2",
-        after: "AFTER_LINK_2"
+        title: "Back Home To Blue",
+        category: "Americana / Country",
+        before: "PASTE_BEFORE_LINK_HERE", 
+        after: "https://www.dropbox.com/scl/fi/vtl2yv1squy8mhs0ops7h/TheLongWait_BackHomeToBlue_Full-master.mp3?rlkey=qp4ob4w0fkpd818c9si15974l&st=f1hmwzkw&dl=0"
     }
 ];
 
+// This function fixes Dropbox links automatically
+function fixLink(url) {
+    if (!url) return "";
+    return url.replace('dl=0', 'raw=1').replace('www.dropbox.com', 'dl.dropboxusercontent.com');
+}
+
 const trackList = document.getElementById("track-list");
 
-// ====== GENERATION LOGIC ======
 tracks.forEach((track, index) => {
     const trackId = index + 1;
+    const initialSrc = fixLink(track.after);
+
     const html = `
     <div class="p-item">
         <div class="p-info">
@@ -53,17 +51,18 @@ tracks.forEach((track, index) => {
         <div class="p-controls">
             <div class="p-switch">
                 <input type="radio" name="track-${trackId}" id="t-${trackId}-b" class="p-radio" 
-                    onchange="syncAudio(${trackId}, '${track.before}')">
+                    onchange="syncAudio(${trackId}, '${fixLink(track.before)}')">
                 <label for="t-${trackId}-b" class="p-label">BEFORE</label>
 
                 <input type="radio" name="track-${trackId}" id="t-${trackId}-a" class="p-radio" checked 
-                    onchange="syncAudio(${trackId}, '${track.after}')">
+                    onchange="syncAudio(${trackId}, '${fixLink(track.after)}')">
                 <label for="t-${trackId}-a" class="p-label">AFTER</label>
 
                 <span class="p-slider"></span>
             </div>
-            <audio id="audio-${trackId}" controls class="p-audio-glass">
-                <source src="${track.after}" type="audio/mpeg">
+            <audio id="audio-${trackId}" controls class="p-audio-glass" preload="auto">
+                <source src="${initialSrc}" type="audio/mpeg">
+                Your browser does not support the audio element.
             </audio>
         </div>
     </div>
@@ -71,19 +70,20 @@ tracks.forEach((track, index) => {
     trackList.insertAdjacentHTML("beforeend", html);
 });
 
-// ====== SURGICAL SYNC FUNCTION ======
 function syncAudio(id, newSrc) {
     const player = document.getElementById('audio-' + id);
+    if (!newSrc || newSrc === "") return;
+    
     const time = player.currentTime;
     const isPlaying = !player.paused;
 
     player.src = newSrc;
-    player.load();
+    player.load(); // Forces the player to acknowledge the new source
     
-    player.addEventListener('loadedmetadata', function() {
+    player.onloadeddata = function() {
         this.currentTime = time;
-        if (isPlaying) this.play();
-    }, { once: true });
+        if (isPlaying) this.play().catch(e => console.log("Playback interrupted"));
+    };
 }
 </script>
 </body>
