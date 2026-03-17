@@ -11,16 +11,52 @@
         .supun-portfolio-glass { padding: 40px 20px; color: #000; }
         .p-container { max-width: 900px; margin: 0 auto; }
 
+        /* FIXED HEADER SECTION */
+        .p-header { 
+            width: 100%;
+            text-align: center; 
+            margin-bottom: 60px; 
+            display: block; /* Stable layout for centering */
+        }
+        .p-badge { 
+            display: block;
+            font-size: 10px; 
+            font-weight: 800; 
+            letter-spacing: 3px; 
+            text-transform: uppercase; 
+            color: #3351d6; 
+            margin-bottom: 8px; 
+        }
+        .p-header h2 { 
+            font-size: 3rem; 
+            font-weight: 800; 
+            letter-spacing: -0.04em; 
+            margin: 0; 
+            line-height: 1.1;
+        }
+        .p-accent { 
+            background: linear-gradient(135deg, #3351d6 0%, #9c27b0 100%); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+        }
+        .p-header-line { 
+            height: 2px; 
+            width: 40px; 
+            background: linear-gradient(90deg, #3351d6, #9c27b0); 
+            margin: 20px auto 0 auto; /* Centers the line */
+            border-radius: 10px; 
+        }
+
+        /* TRACK ITEM LAYOUT */
         .p-item { display: flex; justify-content: space-between; align-items: center; padding: 30px 0; gap: 30px; }
         .p-divider { height: 1px; background: rgba(0,0,0,0.08); margin: 0; }
         .p-info { flex: 1; }
         .p-info h3 { margin: 4px 0 0 0; font-size: 1.3rem; font-weight: 800; color: #000; }
         .p-category { font-size: 10px; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 1.5px; }
 
-        /* Unified Height for Controls */
         .p-controls { display: flex; align-items: center; gap: 15px; flex-shrink: 0; }
 
-        /* BEFORE/AFTER SWITCH - Centered & Matching Height */
+        /* SWITCH */
         .p-switch { 
             position: relative; 
             display: flex; 
@@ -28,7 +64,7 @@
             padding: 3px; 
             border-radius: 8px; 
             width: 150px; 
-            height: 42px; /* Fixed height */
+            height: 42px; 
             box-sizing: border-box;
             border: 1px solid rgba(0,0,0,0.03); 
             align-items: center;
@@ -43,40 +79,36 @@
             cursor: pointer; 
             z-index: 2; 
             transition: 0.3s;
-            line-height: 36px; /* Vertical centering */
+            line-height: 36px;
         }
         .p-slider { 
             position: absolute; 
             top: 3px; 
             left: 3px; 
-            width: 71px; /* Precision width */
-            height: 34px; /* Precision height */
+            width: 71px; 
+            height: 34px; 
             background: linear-gradient(135deg, #3351d6 0%, #9c27b0 100%); 
             border-radius: 6px; 
             transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); 
             z-index: 1; 
         }
-        
-        /* Fixed "After" selection centering */
         .p-switch input:nth-of-type(2):checked ~ .p-slider { transform: translateX(73px); }
         .p-radio:checked + .p-label { color: #fff !important; }
 
-        /* PLAYER UI - Matching Height & Square Design */
+        /* PLAYER */
         .custom-player {
             display: flex !important;
             align-items: center;
             gap: 12px;
             width: 340px; 
-            height: 42px; /* Matches the Switch height exactly */
+            height: 42px; 
             background: #f0f0f0;
             padding: 0 16px;
             border-radius: 8px; 
             border: 1px solid rgba(0,0,0,0.05);
             box-sizing: border-box;
         }
-
         .custom-player audio { display: none !important; }
-
         .play-btn {
             background: #000;
             border: none;
@@ -92,21 +124,13 @@
             transition: 0.2s;
         }
         .play-btn:hover { background: #3351d6; }
-
         .progress-area { flex-grow: 1; height: 4px; background: rgba(0,0,0,0.1); border-radius: 2px; cursor: pointer; position: relative; overflow: hidden; }
         .progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #3351d6, #9c27b0); }
+        .p-time { font-size: 10px; font-weight: 700; color: #666; font-variant-numeric: tabular-nums; min-width: 70px; text-align: right; }
 
-        .p-time { 
-            font-size: 10px; 
-            font-weight: 700; 
-            color: #666; 
-            font-variant-numeric: tabular-nums; 
-            min-width: 70px; 
-            text-align: right; 
-        }
-
-        /* Mobile Adjustments */
+        /* MOBILE FIX */
         @media (max-width: 850px) {
+            .p-header h2 { font-size: 2.2rem; }
             .p-item { flex-direction: column; text-align: center; gap: 20px; }
             .p-controls { flex-direction: column; width: 100%; }
             .custom-player, .p-switch { width: 100%; max-width: 350px; }
@@ -117,22 +141,24 @@
 
 <section class="supun-portfolio-glass">
     <div class="p-container">
-        <div class="p-header">
+        <header class="p-header">
             <span class="p-badge">Portfolio</span>
             <h2>Studio <span class="p-accent">Results.</span></h2>
             <div class="p-header-line"></div>
-        </div>
+        </header>
+
         <div class="p-list" id="track-list"></div>
     </div>
 </section>
 
 <script>
+// Tracks data and functionality remain identical to previous working version
 const tracks = [
     {
         title: "Back Home To Blue",
         category: "Americana / Country",
-        before: "https://www.dropbox.com/scl/fi/vtl2yv1squy8mhs0ops7h/TheLongWait_BackHomeToBlue_Full-master.mp3?rlkey=qp4ob4w0fkpd818c9si15974l&st=f1hmwzkw&dl=0", 
-        after: "https://www.dropbox.com/scl/fi/vtl2yv1squy8mhs0ops7h/TheLongWait_BackHomeToBlue_Full-master.mp3?rlkey=qp4ob4w0fkpd818c9si15974l&st=f1hmwzkw&dl=0"
+        before: "https://www.dropbox.com/scl/fi/vtl2yv1squy8mhs0ops7h/TheLongWait_BackHomeToBlue_Full-master.mp3?rlkey=qp4ob4w0fkpd818c9si15974l&st=f1hmzkw&dl=0", 
+        after: "https://www.dropbox.com/scl/fi/vtl2yv1squy8mhs0ops7h/TheLongWait_BackHomeToBlue_Full-master.mp3?rlkey=qp4ob4w0fkpd818c9si15974l&st=f1hmzkw&dl=0"
     }
 ];
 
